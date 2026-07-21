@@ -17,6 +17,7 @@ const STAGE_WEIGHT   = { lead:0.1, warm:0.3, hot:0.7, signed:1, lost:0 };
 const STALE_DAYS     = { lead:5, warm:7, hot:4 };
 const DAY            = 86400000;
 const NOW            = Date.now();
+const API = import.meta.env.VITE_API_URL;
 const STORAGE_KEY    = "crm_v4";
 const TASKS_KEY      = "crm_tasks_v2";
 const SESSION_KEY    = "crm_session_v2";
@@ -495,8 +496,8 @@ export default function App(){
   const [leads,setLeads]=useState([]),[tasks,setTasks]=useState([]),[loaded,setLoaded]=useState(false),[session,setSession]=useState(null),[editLead,setEditLead]=useState(null),[isNew,setIsNew]=useState(false),[lostTarget,setLostTarget]=useState(null);
 
   useEffect(()=>{(async()=>{
-    try{const r=await window.storage.get(STORAGE_KEY);setLeads(r?.value?JSON.parse(r.value):DEMO_LEADS);}catch{setLeads(DEMO_LEADS);}
-    try{const r=await window.storage.get(TASKS_KEY);setTasks(r?.value?JSON.parse(r.value):DEMO_TASKS);}catch{setTasks(DEMO_TASKS);}
+    try{const r=await fetch(`${API}/api/leads`);setLeads(await r.json());}catch{setLeads(DEMO_LEADS);}
+    try{const r=await fetch(`${API}/api/tasks`);setTasks(await r.json());}catch{setTasks(DEMO_TASKS);}
     try{const r=await window.storage.get(SESSION_KEY);if(r?.value)setSession(JSON.parse(r.value));}catch{}
     setLoaded(true);
   })();},[]);
