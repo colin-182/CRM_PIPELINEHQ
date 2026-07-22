@@ -52,5 +52,31 @@ app.post("/api/leads", async (req, res) => {
   }
 });
 
+app.get("/api/tasks", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM tasks");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/tasks", async (req, res) => {
+  const t = req.body;
+  try {
+    await pool.query(
+      `INSERT INTO tasks (id, lead_id, lead_company, rep, title, due_at, done)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
+       ON CONFLICT (id) DO UPDATE SET
+         lead_id=$2, lead_company=$3, rep=$4, title=$5, due_at=$6, done=$7`,
+      [t.id, t.leadId, t.leadCompany, t.rep, t.title, t.dueAt, t.done]
+    );
+    res.status(201).json(t);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`API running on port ${PORT}`));

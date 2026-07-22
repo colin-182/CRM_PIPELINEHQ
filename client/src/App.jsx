@@ -502,8 +502,12 @@ export default function App(){
     setLoaded(true);
   })();},[]);
 
-  const persist=async u=>{setLeads(u);try{await window.storage.set(STORAGE_KEY,JSON.stringify(u));}catch{}};
-  const persistT=async u=>{setTasks(u);try{await window.storage.set(TASKS_KEY,JSON.stringify(u));}catch{}};
+const persist=async u=>{
+  setLeads(u);
+  try{
+    await Promise.all(u.map(lead=>fetch(`${API}/api/leads`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(lead)})));
+  }catch{}
+};
 
   async function login(s){setSession(s);try{await window.storage.set(SESSION_KEY,JSON.stringify(s));}catch{}}
   async function logout(){setSession(null);try{await window.storage.delete(SESSION_KEY);}catch{}}
